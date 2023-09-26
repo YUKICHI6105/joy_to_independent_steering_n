@@ -1,6 +1,8 @@
 #pragma once
 
 #include <chrono>
+#include <string>
+#include <string_view>
 #include <functional>
 
 #include <rclcpp/rclcpp.hpp>
@@ -28,11 +30,11 @@ namespace nhk2024::joy_to_independent_steering_n::node
 		rclcpp::TimerBase::SharedPtr timer{};
 
 		public:
-		Node(const std::string_view node_name, const rclcpp::NodeOptions& options) noexcept:
+		Node(const std::string_view node_name, const std::string_view steering_node_name, const rclcpp::NodeOptions& options) noexcept:
 			rclcpp::Node(std::string(node_name), options),
-			control_mode_pub{create_publisher<std_msgs::msg::UInt8>("control_mode", 10)},
-			linear_velocity_pub{create_publisher<::independent_steering_n::msg::LinearVelocity>("linear_velocity", 1)},
-			angular_velocity_pub{create_publisher<::independent_steering_n::msg::AngularVelocity>("angular_velocity", 1)},
+			control_mode_pub{create_publisher<std_msgs::msg::UInt8>(std::string(steering_node_name) + "control_mode", 10)},
+			linear_velocity_pub{create_publisher<::independent_steering_n::msg::LinearVelocity>(std::string(steering_node_name) + "linear_velocity", 1)},
+			angular_velocity_pub{create_publisher<::independent_steering_n::msg::AngularVelocity>(std::string(steering_node_name) + "angular_velocity", 1)},
 			logicool{*this, "joy"}
 		{
 			using namespace std::chrono_literals;
