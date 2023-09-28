@@ -1,0 +1,14 @@
+<launch>
+
+  <node pkg="joy" exec="joy_node" name="joy_node">
+  </node>
+
+  <node pkg="independent_steering_n" exec="node" name="node_n">
+  </node>
+
+  <node pkg="joy_to_independent_steering_n" exec="node" name="node_joy">
+  </node>
+
+  <include file="$(find-pkg-share can_plugins2)/launch/slcan_bridge_launch.xml"/>
+
+</launch>
