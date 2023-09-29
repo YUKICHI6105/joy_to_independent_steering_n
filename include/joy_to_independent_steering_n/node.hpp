@@ -77,7 +77,7 @@ namespace nhk2024::joy_to_independent_steering_n::node
 				case ControlMode::crab:
 				{
 					const auto axes = logicool.get_axes();
-					const auto vx = axes[Logicool::Axes::l_stick_LR];
+					const auto vx = -axes[Logicool::Axes::l_stick_LR];
 					const auto vy = axes[Logicool::Axes::l_stick_UD];
 					auto msg = ::independent_steering_n::msg::LinearVelocity{};
 					msg.x = vx;
