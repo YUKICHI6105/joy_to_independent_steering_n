@@ -18,6 +18,9 @@
 
 namespace nhk2024::joy_to_independent_steering_n::node
 {
+	constexpr float epsilon = 0.1f;
+	constexpr float deadzone = 0.1f;
+
 	class Node : public rclcpp::Node
 	{
 		rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr control_mode_pub;
@@ -26,6 +29,8 @@ namespace nhk2024::joy_to_independent_steering_n::node
 
 		CRSLib::Ros2::Logicool logicool;
 		independent_steering_n::control_mode::ControlMode mode{independent_steering_n::control_mode::ControlMode::disable};
+		float last_vx{0.0f};
+		float last_vy{0.0f};
 
 		rclcpp::TimerBase::SharedPtr timer{};
 
@@ -79,10 +84,15 @@ namespace nhk2024::joy_to_independent_steering_n::node
 					const auto axes = logicool.get_axes();
 					const auto vx = -axes[Logicool::Axes::l_stick_LR];
 					const auto vy = axes[Logicool::Axes::l_stick_UD];
-					auto msg = ::independent_steering_n::msg::LinearVelocity{};
-					msg.x = vx;
-					msg.y = vy;
-					linear_velocity_pub->publish(msg);
+					if(logicool.is_being_pushed(Logicool::Buttons::y) || (deadzone < vx * vx + vy * vy && last_vx * last_vx + last_vy * last_vy <= vx * vx + vy * vy + epsilon))
+					{
+						auto msg = ::independent_steering_n::msg::LinearVelocity{};
+						msg.x = vx;
+						msg.y = vy;
+						linear_velocity_pub->publish(msg);
+					}
+					last_vx = vx;
+					last_vy = vy;
 				}
 				break;
 
