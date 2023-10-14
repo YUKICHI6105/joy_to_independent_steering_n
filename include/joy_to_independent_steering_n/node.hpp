@@ -20,6 +20,8 @@ namespace nhk2024::joy_to_independent_steering_n::node
 {
 	constexpr float epsilon = 0.1f;
 	constexpr float deadzone = 0.1f;
+	constexpr float max_linear_velocity = 30.0f;
+	constexpr float max_angular_velocity = 30.0f;
 
 	class Node : public rclcpp::Node
 	{
@@ -87,8 +89,8 @@ namespace nhk2024::joy_to_independent_steering_n::node
 					if(logicool.is_being_pushed(Logicool::Buttons::y) || (deadzone < vx * vx + vy * vy && last_vx * last_vx + last_vy * last_vy <= vx * vx + vy * vy + epsilon))
 					{
 						auto msg = ::independent_steering_n::msg::LinearVelocity{};
-						msg.x = vx;
-						msg.y = vy;
+						msg.x = vx * max_linear_velocity;
+						msg.y = vy * max_linear_velocity;
 						linear_velocity_pub->publish(msg);
 					}
 					last_vx = vx;
@@ -101,7 +103,7 @@ namespace nhk2024::joy_to_independent_steering_n::node
 					const auto axes = logicool.get_axes();
 					const auto yaw = axes[Logicool::Axes::r_stick_LR];
 					auto msg = ::independent_steering_n::msg::AngularVelocity{};
-					msg.yaw = yaw;
+					msg.yaw = yaw * max_angular_velocity;
 					angular_velocity_pub->publish(msg);
 				}
 				break;
